@@ -1,5 +1,6 @@
 package br.com.alura.forum.service
 
+import br.com.alura.forum.dto.AtualizacaoTopicoDTO
 import br.com.alura.forum.dto.NovoTopicoDTO
 import br.com.alura.forum.dto.presenters.TopicoPresenter
 import br.com.alura.forum.mappers.NovoTopicoMapper
@@ -31,6 +32,30 @@ class TopicoService(
     fun cadastrar(dto: NovoTopicoDTO) {
         val topico = topicoNovoTopicoMapper.map(dto)
         topico.id = topicos.size.toLong() + 1
-        topicos = topicos.plus(topico)}
+        topicos = topicos.plus(topico)
+    }
+
+    fun atualizar(topico: AtualizacaoTopicoDTO) {
+        val topicoAnterior = topicos.stream().filter { t ->
+            t.id == topico.id
+        }.findFirst().get()
+
+        topicos = topicos.minus(topicoAnterior).plus(Topico(
+                id = topico.id,
+                titulo = topico.titulo,
+                mensagem = topico.mensagem,
+                autor = topicoAnterior.autor,
+                curso = topicoAnterior.curso,
+                respostas = topicoAnterior.respostas
+        ))
+    }
+
+    fun deletar(id: Long) {
+        val topicoDelete = topicos.stream().filter { t ->
+            t.id == id
+        }.findFirst().get()
+
+        topicos = topicos.minus(topicoDelete)
+    }
 
 }
