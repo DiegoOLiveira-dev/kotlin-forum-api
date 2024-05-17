@@ -29,25 +29,28 @@ class TopicoService(
         return topicoPresenterMapper.map(topico)
     }
 
-    fun cadastrar(dto: NovoTopicoDTO) {
+    fun cadastrar(dto: NovoTopicoDTO): TopicoPresenter {
         val topico = topicoNovoTopicoMapper.map(dto)
         topico.id = topicos.size.toLong() + 1
         topicos = topicos.plus(topico)
+        return topicoPresenterMapper.map(topico)
     }
 
-    fun atualizar(topico: AtualizacaoTopicoDTO) {
+    fun atualizar(topico: AtualizacaoTopicoDTO): TopicoPresenter {
         val topicoAnterior = topicos.stream().filter { t ->
             t.id == topico.id
         }.findFirst().get()
-
-        topicos = topicos.minus(topicoAnterior).plus(Topico(
+        val topicoAtualizado = Topico(
                 id = topico.id,
                 titulo = topico.titulo,
                 mensagem = topico.mensagem,
                 autor = topicoAnterior.autor,
                 curso = topicoAnterior.curso,
                 respostas = topicoAnterior.respostas
-        ))
+        )
+        topicos = topicos.minus(topicoAnterior).plus(topicoAtualizado)
+
+        return topicoPresenterMapper.map(topicoAtualizado)
     }
 
     fun deletar(id: Long) {
