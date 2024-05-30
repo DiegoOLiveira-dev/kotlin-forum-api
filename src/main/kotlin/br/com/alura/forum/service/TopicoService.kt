@@ -3,6 +3,7 @@ package br.com.alura.forum.service
 import br.com.alura.forum.dto.AtualizacaoTopicoDTO
 import br.com.alura.forum.dto.NovoTopicoDTO
 import br.com.alura.forum.dto.presenters.TopicoPresenter
+import br.com.alura.forum.exceptions.NotFoundException
 import br.com.alura.forum.mappers.NovoTopicoMapper
 import br.com.alura.forum.mappers.TopicoPresenterMapper
 import br.com.alura.forum.model.Topico
@@ -24,7 +25,7 @@ class TopicoService(
     fun buscarPorId(id: Long): TopicoPresenter {
         val topico = topicos.stream().filter { t ->
             t.id == id
-        }.findFirst().get()
+        }.findFirst().orElseThrow{NotFoundException("Topico inexistente")}
 
         return topicoPresenterMapper.map(topico)
     }
@@ -39,7 +40,7 @@ class TopicoService(
     fun atualizar(topico: AtualizacaoTopicoDTO): TopicoPresenter {
         val topicoAnterior = topicos.stream().filter { t ->
             t.id == topico.id
-        }.findFirst().get()
+        }.findFirst().orElseThrow{NotFoundException("Topico inexistente")}
         val topicoAtualizado = Topico(
                 id = topico.id,
                 titulo = topico.titulo,
@@ -56,7 +57,7 @@ class TopicoService(
     fun deletar(id: Long) {
         val topicoDelete = topicos.stream().filter { t ->
             t.id == id
-        }.findFirst().get()
+        }.findFirst().orElseThrow{NotFoundException("Topico inexistente")}
 
         topicos = topicos.minus(topicoDelete)
     }
