@@ -1,25 +1,16 @@
 package br.com.alura.forum.service
 
+import br.com.alura.forum.exceptions.NotFoundException
 import br.com.alura.forum.model.Usuario
+import br.com.alura.forum.repository.UsuarioRepository
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class UsuarioService(var autores: List<Usuario>) {
-
-    init {
-        val autor = Usuario(
-                id = 1,
-                nome = "Paulo Jean",
-                email = "paulo@email.com"
-        )
-        autores = listOf(autor)
-    }
+class UsuarioService(private val repository: UsuarioRepository) {
 
     fun buscarPorId(id: Long): Usuario {
-        return autores.stream().filter { a ->
-            a.id == id
-        }.findFirst().get()
+        return repository.findById(id).orElseThrow{ NotFoundException("Usuario inexistente") }
     }
 
 }

@@ -8,6 +8,7 @@ import br.com.alura.forum.service.TopicoService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -35,6 +36,7 @@ class TopicoController(private val service: TopicoService) {
     }
 
     @PostMapping
+    @Transactional
     fun cadastrar(
             @RequestBody @Valid topico: NovoTopicoDTO,
             uriBuilder: UriComponentsBuilder
@@ -45,6 +47,7 @@ class TopicoController(private val service: TopicoService) {
     }
 
     @PutMapping
+    @Transactional
     fun atualizar(@RequestBody @Valid topico: AtualizacaoTopicoDTO): ResponseEntity<TopicoPresenter>{
         val topicoPresenter = service.atualizar(topico)
         return ResponseEntity.ok(topicoPresenter)
@@ -52,6 +55,7 @@ class TopicoController(private val service: TopicoService) {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
     fun deletar(@PathVariable id: Long){
         return service.deletar(id)
     }

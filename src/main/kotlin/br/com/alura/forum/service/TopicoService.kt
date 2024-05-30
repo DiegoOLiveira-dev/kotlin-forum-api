@@ -7,59 +7,44 @@ import br.com.alura.forum.exceptions.NotFoundException
 import br.com.alura.forum.mappers.NovoTopicoMapper
 import br.com.alura.forum.mappers.TopicoPresenterMapper
 import br.com.alura.forum.model.Topico
+import br.com.alura.forum.repository.TopicoRepository
 import org.springframework.stereotype.Service
 import java.util.stream.Collectors
 
 @Service
 class TopicoService(
-        private var topicos: List<Topico>,
+        private val repository: TopicoRepository,
         private var topicoPresenterMapper: TopicoPresenterMapper,
         private var topicoNovoTopicoMapper: NovoTopicoMapper
         ) {
 
 
     fun listar(): List<TopicoPresenter> {
-        return topicos.stream().map { t -> topicoPresenterMapper.map(t)}.collect(Collectors.toList())
+        return repository.findAll().stream().map { t -> topicoPresenterMapper.map(t)}.collect(Collectors.toList())
     }
 
     fun buscarPorId(id: Long): TopicoPresenter {
-        val topico = topicos.stream().filter { t ->
-            t.id == id
-        }.findFirst().orElseThrow{NotFoundException("Topico inexistente")}
-
+        val topico = repository.findById(id)
+                .orElseThrow{NotFoundException("Topico inexistente")}
         return topicoPresenterMapper.map(topico)
     }
 
     fun cadastrar(dto: NovoTopicoDTO): TopicoPresenter {
         val topico = topicoNovoTopicoMapper.map(dto)
-        topico.id = topicos.size.toLong() + 1
-        topicos = topicos.plus(topico)
+        repository.save(topico)
         return topicoPresenterMapper.map(topico)
     }
 
-    fun atualizar(topico: AtualizacaoTopicoDTO): TopicoPresenter {
-        val topicoAnterior = topicos.stream().filter { t ->
-            t.id == topico.id
-        }.findFirst().orElseThrow{NotFoundException("Topico inexistente")}
-        val topicoAtualizado = Topico(
-                id = topico.id,
-                titulo = topico.titulo,
-                mensagem = topico.mensagem,
-                autor = topicoAnterior.autor,
-                curso = topicoAnterior.curso,
-                respostas = topicoAnterior.respostas
-        )
-        topicos = topicos.minus(topicoAnterior).plus(topicoAtualizado)
+    fun atualizar(form: AtualizacaoTopicoDTO): TopicoPresenter {
+        val topico = repository.findById(form.id).orElseThrow{NotFoundException("Topico inexistente")}
 
-        return topicoPresenterMapper.map(topicoAtualizado)
+        topico.titulo = form.titulo
+        topico.mensagem = form.mensagem
+        return topicoPresenterMapper.map(topico)
     }
 
     fun deletar(id: Long) {
-        val topicoDelete = topicos.stream().filter { t ->
-            t.id == id
-        }.findFirst().orElseThrow{NotFoundException("Topico inexistente")}
-
-        topicos = topicos.minus(topicoDelete)
+       repository.deleteById(id)
     }
 
 }
