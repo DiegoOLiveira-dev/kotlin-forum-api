@@ -19,8 +19,15 @@ class TopicoService(
         ) {
 
 
-    fun listar(): List<TopicoPresenter> {
-        return repository.findAll().stream().map { t -> topicoPresenterMapper.map(t)}.collect(Collectors.toList())
+    fun listar(nomeCurso: String?): List<TopicoPresenter> {
+        val topicos = if(nomeCurso == null) {
+            repository.findAll()
+        } else {
+            repository.findByCursoNome(nomeCurso)
+        }
+        return topicos.stream().map { t ->
+            topicoPresenterMapper.map(t)
+        }.collect(Collectors.toList())
     }
 
     fun buscarPorId(id: Long): TopicoPresenter {

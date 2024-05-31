@@ -10,9 +10,9 @@ data class Topico (
         var titulo: String,
         var mensagem: String,
         val dataCriacao: LocalDateTime = LocalDateTime.now(),
-        @ManyToOne
+        @ManyToOne(fetch = FetchType.LAZY)
         val curso: Curso,
-        @ManyToOne
+        @ManyToOne(fetch = FetchType.LAZY)
         val autor: Usuario,
         @Enumerated(value = EnumType.STRING)
         val status: StatusTopico = StatusTopico.NAO_RESPONDIDO,
