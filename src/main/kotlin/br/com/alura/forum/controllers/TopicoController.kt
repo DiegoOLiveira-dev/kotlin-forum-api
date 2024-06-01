@@ -6,6 +6,8 @@ import br.com.alura.forum.dto.presenters.TopicoPresenter
 import br.com.alura.forum.model.Topico
 import br.com.alura.forum.service.TopicoService
 import jakarta.validation.Valid
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -31,6 +33,7 @@ import java.util.*
 class TopicoController(private val service: TopicoService) {
 
     @GetMapping()
+    @Cacheable("topicos")
     fun listar(@RequestParam(required = false) nomeCurso: String?,@PageableDefault(size = 5, sort = ["dataCriacao"], direction = Sort.Direction.DESC) paginacao: Pageable): Page<TopicoPresenter>{
         return service.listar(nomeCurso, paginacao)
     }
@@ -42,6 +45,7 @@ class TopicoController(private val service: TopicoService) {
 
     @PostMapping
     @Transactional
+    @CacheEvict(value = ["topicos"], allEntries = true)
     fun cadastrar(
             @RequestBody @Valid topico: NovoTopicoDTO,
             uriBuilder: UriComponentsBuilder
@@ -53,6 +57,7 @@ class TopicoController(private val service: TopicoService) {
 
     @PutMapping
     @Transactional
+    @CacheEvict(value = ["topicos"], allEntries = true)
     fun atualizar(@RequestBody @Valid topico: AtualizacaoTopicoDTO): ResponseEntity<TopicoPresenter>{
         val topicoPresenter = service.atualizar(topico)
         return ResponseEntity.ok(topicoPresenter)
@@ -61,6 +66,7 @@ class TopicoController(private val service: TopicoService) {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
+    @CacheEvict(value = ["topicos"], allEntries = true)
     fun deletar(@PathVariable id: Long){
         return service.deletar(id)
     }
